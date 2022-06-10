@@ -1,0 +1,21 @@
+replicaCount: 1
+
+metadata:
+  labels:
+    environment: dev
+
+image:
+  repository: bahmniindiadistro
+  name: otp-service
+  tag: latest
+
+service:
+  type: ClusterIP
+  port: 8092
+
+config:
+  WHITELISTED_NUMBERS: "+917888463698,7888463698,+919856261879,9856261879,+918825609370,8825609370,+917838473065,7838473065"
+  CONNECTION_STRING: "Host=bahmni-dev-postgresql;Port=5432;Username=postgres;Password=welcome;Database=otpservice;"
+
+autoscaling:
+  enabled: false
