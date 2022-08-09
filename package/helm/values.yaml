@@ -19,3 +19,7 @@ config:
 
 autoscaling:
   enabled: false
+
+nodeSelector: {}
+affinity: {}
+tolerations: {}
