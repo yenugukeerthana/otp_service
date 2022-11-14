@@ -1,43 +1,55 @@
 using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace In.ProjectEKA.OtpService.Clients
 {
-	using System.Collections.Specialized;
-	using System.Net;
-	using System.Text;
 	using System.Threading.Tasks;
-	using System.Web;
 	using Common;
 	using Common.Logger;
-	using Microsoft.Extensions.Configuration;
-	using Newtonsoft.Json.Linq;
+	using System.Net.Http;
+	using System.Net.Mime;
+	using System.Text;
+	using System.Text.Json;
 
 	public class SmsClient : ISmsClient
     {
-        private readonly IConfiguration configuration;
+	    private readonly HttpClient httpClient;
+        private readonly D7SmsServiceProperties d7SmsServiceProperties;
 
-        public SmsClient(IConfiguration configuration)
+        public SmsClient(D7SmsServiceProperties d7SmsServiceProperties)
         {
-            this.configuration = configuration;
+	        httpClient = new HttpClient();
+	        this.d7SmsServiceProperties = d7SmsServiceProperties;
         }
 
-        public async Task<Response> Send(string phoneNumber, string message, string templateID)
+        public async Task<Response> Send(string phoneNumber, string message, string originator)
         {
-            var notification = HttpUtility.UrlEncode(message);
-            using var webClient = new WebClient();
-            var response = await webClient.UploadValuesTaskAsync("https://api.textlocal.in/send/",
-                new NameValueCollection
-                {
-                    {"apikey" , configuration.GetConnectionString("TextLocaleApiKey")},
-                    {"numbers" , phoneNumber},
-                    {"message" , notification},
-                    {"sender name" , "HCMNCG"},
-                });
-            var json = JObject.Parse(Encoding.UTF8.GetString(response));
-            Log.Information((string)json["status"] == "success" ? "Success in sending notification" :
-                (string)json["errors"][0]["message"]);
-            return (string)json["status"] == "success" ?  new Response(ResponseType.Success,"Notification sent") 
-                    :new Response(ResponseType.Success, (string)json["errors"][0]["message"]);
+	        try
+            {
+	            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.d7networks.com/messages/v1/send");
+
+	            request.Headers.Add("Accept", "application/json");
+	            request.Headers.Add("Authorization", "Bearer " + d7SmsServiceProperties.Token);
+	        
+	            var json = JsonSerializer.Serialize(new D7Message(d7SmsServiceProperties.Channel,new List<string>(){phoneNumber}, message,
+		            "text", originator));
+	            request.Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);;
+
+	            HttpResponseMessage response = await httpClient.SendAsync(request);
+	            
+	            var contents = await response.Content.ReadAsStringAsync();
+	            Log.Information(contents);
+	            if (response.StatusCode == (HttpStatusCode) 200)
+		            return new Response(ResponseType.Success, "Notification sent");
+	            Log.Error(response.StatusCode,response.Content);
+            }
+	        catch (Exception exception)
+	        {
+		        Log.Error(exception, exception.StackTrace);
+		        return new Response(ResponseType.InternalServerError, "Unable to send message.");
+	        }
+	        return new Response(ResponseType.Success, "Error in sending notification");
         }
     }
 }

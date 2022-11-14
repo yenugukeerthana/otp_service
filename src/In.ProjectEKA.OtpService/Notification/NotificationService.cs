@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using In.ProjectEKA.OtpService.Clients;
 using In.ProjectEKA.OtpService.Common;
-using In.ProjectEKA.OtpService.Otp;
 using Newtonsoft.Json.Linq;
 
 namespace In.ProjectEKA.OtpService.Notification
