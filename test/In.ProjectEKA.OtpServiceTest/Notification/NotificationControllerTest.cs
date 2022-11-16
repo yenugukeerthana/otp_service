@@ -40,5 +40,24 @@ namespace In.ProjectEKA.OtpServiceTest.Notification
                 .Should()
                 .BeEquivalentTo(expectedResponse);
         }
+        
+        [Fact]
+        public async Task ShouldSuccessInNotificationSms()
+        {
+	        var expectedResponse = new Response(ResponseType.Success, "Notification sent");
+	        smsClient.Setup(e => e.Send("+919876543210","message","originator/template")
+	        ).ReturnsAsync(expectedResponse);
+	        
+	        var response = await notificationController.SendSMS("+919876543210","message","originator/template");
+	        
+	        smsClient.Verify();
+	        response.Should()
+		        .NotBeNull()
+		        .And
+		        .Subject.As<OkObjectResult>()
+		        .Value
+		        .Should()
+		        .BeEquivalentTo(expectedResponse);
+        }
     }
 }
