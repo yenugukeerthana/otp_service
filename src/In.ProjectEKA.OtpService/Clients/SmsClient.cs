@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace In.ProjectEKA.OtpService.Clients
 {
@@ -31,10 +32,12 @@ namespace In.ProjectEKA.OtpService.Clients
 
 	            request.Headers.Add("Accept", "application/json");
 	            request.Headers.Add("Authorization", "Bearer " + d7SmsServiceProperties.Token);
-	        
-	            var json = JsonSerializer.Serialize(new D7Message(d7SmsServiceProperties.Channel,new List<string>(){phoneNumber}, message,
+	            var messages = new List<D7Message>();
+	            messages.Add(new D7Message(d7SmsServiceProperties.Channel, new List<string>() {phoneNumber}, message,
 		            "text", originator));
-	            request.Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);;
+	            var json = JsonConvert.SerializeObject(new {messages});
+	            request.Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+	            
 
 	            HttpResponseMessage response = await httpClient.SendAsync(request);
 	            
