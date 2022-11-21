@@ -24,7 +24,7 @@ namespace In.ProjectEKA.OtpService.Clients
 	        this.d7SmsServiceProperties = d7SmsServiceProperties;
         }
 
-        public async Task<Response> Send(string phoneNumber, string message, string originator)
+        public async Task<Response> Send(string phoneNumber, string message, string templateId)
         {
 	        try
             {
@@ -34,7 +34,7 @@ namespace In.ProjectEKA.OtpService.Clients
 	            request.Headers.Add("Authorization", "Bearer " + d7SmsServiceProperties.Token);
 	            var messages = new List<D7Message>();
 	            messages.Add(new D7Message(d7SmsServiceProperties.Channel, new List<string>() {phoneNumber}, message,
-		            "text", originator));
+		            "text", d7SmsServiceProperties.Originator));
 	            var json = JsonConvert.SerializeObject(new {messages});
 	            request.Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
 	            

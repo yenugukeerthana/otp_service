@@ -64,7 +64,8 @@ namespace In.ProjectEKA.OtpService
                 services.AddSingleton<ISmsClient, SmsClient>()
                     .AddSingleton(new D7SmsServiceProperties(
                         Configuration.GetValue<string>("D7SmsService:Token"),
-                        Configuration.GetValue<string>("D7SmsService:Channel")));
+                        Configuration.GetValue<string>("D7SmsService:Channel"),
+                        Configuration.GetValue<string>("D7SmsService:Originator")));
             }
         }
 

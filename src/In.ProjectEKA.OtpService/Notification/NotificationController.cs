@@ -28,9 +28,9 @@ namespace In.ProjectEKA.OtpService.Notification
 		}
 		
 		[HttpPost("sms")]
-		public async Task<ActionResult> SendSMS(string phoneNumber, string message,string originator)
+		public async Task<ActionResult> SendSMS(string phoneNumber, string message)
 		{
-			return ResponseFrom(await smsClient.Send(phoneNumber,message,originator));
+			return ResponseFrom(await smsClient.Send(phoneNumber,message));
 		}
 		private ActionResult ResponseFrom(Response notificationResponse)
 		{
