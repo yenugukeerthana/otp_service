@@ -1,3 +1,4 @@
+using System;
 using In.ProjectEKA.OtpService.Clients;
 using Serilog;
 
@@ -28,9 +29,9 @@ namespace In.ProjectEKA.OtpService.Notification
 		}
 		
 		[HttpPost("sms")]
-		public async Task<ActionResult> SendSMS(string phoneNumber, string message)
+		public async Task<ActionResult> SendSMS([FromBody] SMSRequest smsRequest)
 		{
-			return ResponseFrom(await smsClient.Send(phoneNumber,message));
+			return ResponseFrom(await smsClient.Send(Uri.UnescapeDataString(smsRequest.PhoneNumber),smsRequest.Message));
 		}
 		private ActionResult ResponseFrom(Response notificationResponse)
 		{

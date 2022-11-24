@@ -47,7 +47,7 @@ namespace In.ProjectEKA.OtpServiceTest.Notification
 	        var expectedResponse = new Response(ResponseType.Success, "Notification sent");
 	        smsClient.Setup(e => e.Send("+919876543210","message",null)).ReturnsAsync(expectedResponse);
 	        
-	        var response = await notificationController.SendSMS("+919876543210","message");
+	        var response = await notificationController.SendSMS(new SMSRequest("+919876543210","message"));
 	        
 	        smsClient.Verify();
 	        response.Should()
