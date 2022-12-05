@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace In.ProjectEKA.OtpService.Clients
 {
@@ -6,7 +7,7 @@ namespace In.ProjectEKA.OtpService.Clients
 	using Common;
 
 	public interface ISmsClient
-    {
-        public Task<Response> Send(string phoneNumber, string message, String templateID);
-    }
+	{
+		public Task<Response> Send(string phoneNumber, string message, [Optional] String templateID);
+	}
 }

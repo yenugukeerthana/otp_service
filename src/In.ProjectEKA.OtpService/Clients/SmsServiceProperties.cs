@@ -1,4 +1,4 @@
-namespace In.ProjectEKA.OtpService.Otp
+namespace In.ProjectEKA.OtpService.Clients
 {
 	using System;
 	using System.Text;

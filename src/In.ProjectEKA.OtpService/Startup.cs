@@ -31,6 +31,14 @@ namespace In.ProjectEKA.OtpService
                 .AddSingleton(new OtpProperties(Configuration.GetValue<int>("expiryInMinutes")))
                 .AddSingleton(new NotificationProperties(Configuration.GetValue<string>("patientIdName"),
                     Configuration.GetValue<string>("whitelisted:numbers")?.Split(",").ToList()))
+                .AddSingleton(new SmsServiceProperties(
+                    Configuration.GetValue<string>("SmsService:ClientId"),
+                    Configuration.GetValue<string>("SmsService:ClientSecret"),
+                    Configuration.GetValue<string>("SmsService:SmsApi"),
+                    Configuration.GetValue<string>("SmsService:Signature"),
+                    Configuration.GetValue<string>("SmsService:EntityId"),
+                    Configuration.GetValue<int>("SmsService:AccessTokenTTLInMin"),
+                    Configuration.GetValue<string>("SmsService:SmsSuffix")))
                 .AddScoped<IOtpRepository, OtpRepository>()
                 .AddScoped<IOtpGenerator, OtpGenerator>()
                 .AddScoped<INotificationService, NotificationService>()
@@ -49,19 +57,15 @@ namespace In.ProjectEKA.OtpService
             if (Configuration.GetValue<bool>("UseGatewaySmsClient"))
             {
                 services
-                    .AddSingleton<ISmsClient, GatewaySmsClient>()
-                    .AddSingleton(new SmsServiceProperties(
-                        Configuration.GetValue<string>("SmsService:ClientId"),
-                        Configuration.GetValue<string>("SmsService:ClientSecret"),
-                        Configuration.GetValue<string>("SmsService:SmsApi"),
-                        Configuration.GetValue<string>("SmsService:Signature"),
-                        Configuration.GetValue<string>("SmsService:EntityId"),
-                        Configuration.GetValue<int>("SmsService:AccessTokenTTLInMin"),
-                        Configuration.GetValue<string>("SmsService:SmsSuffix")));
+                    .AddSingleton<ISmsClient, GatewaySmsClient>();
             }
             else
             {
-                services.AddSingleton<ISmsClient, SmsClient>();
+                services.AddSingleton<ISmsClient, SmsClient>()
+                    .AddSingleton(new D7SmsServiceProperties(
+                        Configuration.GetValue<string>("D7SmsService:Token"),
+                        Configuration.GetValue<string>("D7SmsService:Channel"),
+                        Configuration.GetValue<string>("D7SmsService:Originator")));
             }
         }
 

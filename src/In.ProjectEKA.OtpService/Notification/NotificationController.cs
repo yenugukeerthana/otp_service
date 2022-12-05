@@ -1,3 +1,7 @@
+using System;
+using In.ProjectEKA.OtpService.Clients;
+using Serilog;
+
 namespace In.ProjectEKA.OtpService.Notification
 {
 	using System.Threading.Tasks;
@@ -10,10 +14,12 @@ namespace In.ProjectEKA.OtpService.Notification
 	public class NotificationController : Controller
 	{
 		private readonly INotificationService notificationService;
+		private readonly ISmsClient smsClient;
 
-		public NotificationController(INotificationService notificationService)
+		public NotificationController(INotificationService notificationService, ISmsClient smsClient)
 		{
 			this.notificationService = notificationService;
+			this.smsClient = smsClient;
 		}
 
 		[HttpPost]
@@ -21,7 +27,12 @@ namespace In.ProjectEKA.OtpService.Notification
 		{
 			return ResponseFrom(await notificationService.SendNotification(notification));
 		}
-
+		
+		[HttpPost("sms")]
+		public async Task<ActionResult> SendSMS([FromBody] SMSRequest smsRequest)
+		{
+			return ResponseFrom(await smsClient.Send(Uri.UnescapeDataString(smsRequest.PhoneNumber),smsRequest.Message));
+		}
 		private ActionResult ResponseFrom(Response notificationResponse)
 		{
 			return notificationResponse.ResponseType switch
